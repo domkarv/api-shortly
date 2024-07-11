@@ -1,0 +1,22 @@
+{
+  "name": "url-shortner",
+  "version": "1.0.0",
+  "type": "module",
+  "main": "src/index.ts",
+  "description": "",
+  "scripts": {
+    "dev:tsc": "tsc -b --watch --preserveWatchOutput",
+    "dev:node": "node --enable-source-maps --watch dist/index.js",
+    "dev": "pnpm run \"/dev:/\"",
+    "build": "tsc -b",
+    "prestart": "pnpm build",
+    "start": "pnpm build && node dist/index.js"
+  },
+  "keywords": [],
+  "author": "Omkar Date",
+  "license": "ISC",
+  "devDependencies": {
+    "@types/node": "^20.14.10",
+    "typescript": "^5.5.3"
+  }
+}
