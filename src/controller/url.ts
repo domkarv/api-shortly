@@ -8,17 +8,17 @@ const generateShortUrl = async (req: Request, res: Response) => {
 
   if (!url) return res.status(400).json({ error: "URL is required" });
 
+  const existingUrl = await URI.findOne({ redirectUrl: url });
+  const baseUrl = `${req.protocol}://${req.hostname}:${PORT}`;
+
+  if (existingUrl) {
+    return res.json({
+      message: "URL already shortened!",
+      shortUrl: `${baseUrl}/${existingUrl.shortId}`,
+    });
+  }
+
   try {
-    const existingUrl = await URI.findOne({ redirectUrl: url });
-    const baseUrl = `${req.protocol}://${req.hostname}:${PORT}`;
-
-    if (existingUrl) {
-      return res.json({
-        message: "URL already shortened!",
-        shortUrl: `${baseUrl}/${existingUrl.shortId}`,
-      });
-    }
-
     const shortId = nanoid(8);
     await URI.create({
       shortId,
@@ -54,7 +54,7 @@ const redirectToMainUrl = async (req: Request, res: Response) => {
       }
     );
 
-    if (!urlData) return res.status(404).json({ error: "URL Not Found" });
+    if (!urlData) return res.status(404).json({ error: "Invallid URL" });
 
     res.redirect(urlData.redirectUrl);
   } catch (error) {
@@ -65,4 +65,17 @@ const redirectToMainUrl = async (req: Request, res: Response) => {
   }
 };
 
-export { generateShortUrl, redirectToMainUrl };
+const handleAnalytics = async (req: Request, res: Response) => {
+  const shortId = req.params.shortId;
+
+  const urlData = await URI.findOne({ shortId });
+
+  if (!urlData) return res.status(404).json({ error: "Invalid URL" });
+
+  return res.json({
+    visitCount: urlData.visitHistory.length,
+    visitAnalytics: urlData.visitHistory,
+  });
+};
+
+export { generateShortUrl, redirectToMainUrl, handleAnalytics };
