@@ -1,15 +1,21 @@
 import { NextFunction, Request, Response } from "express";
+import whatwg from "whatwg-url";
 
 export const parseUrlMiddleware = (
   req: Request,
   res: Response,
   next: NextFunction
 ) => {
-  const originalUrl = req.body.url || req.url;
+  const originalUrl = req.body.url as string;
 
   if (originalUrl) {
-    const parsedUrl = new URL(originalUrl);
-    req.body.url = parsedUrl.toString().replace(/#.*$/, "");
+    try {
+      const parsedUrl = whatwg.parseURL(originalUrl);
+      const newUrl = whatwg.serializeURL(parsedUrl!, true);
+      req.body.url = newUrl;
+    } catch (error) {
+      req.body.url = originalUrl;
+    }
   }
 
   next();

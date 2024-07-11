@@ -5,6 +5,7 @@ import { parseUrlMiddleware } from "../middleware/parse-url.js";
 const urlRouter = Router();
 
 urlRouter.post("/short-url", parseUrlMiddleware, generateShortUrl);
+
 urlRouter.get("/:shortId", redirectToMainUrl);
 
 export { urlRouter };
