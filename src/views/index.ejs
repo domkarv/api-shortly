@@ -4,10 +4,135 @@
     <meta charset="UTF-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <link rel="stylesheet" href="css/output.css" />
-    <title>URL Shortner</title>
+    <title>Shortly</title>
   </head>
 
-  <body>
-    <h1 class="text-3xl font-black">URL Shortner</h1>
+  <body class="mx-4 mb-32 mt-12 max-w-2xl antialiased md:flex-row lg:mx-auto">
+    <h1 class="text-3xl text-center font-extrabold">
+      <a href="/">Shortly</a>
+    </h1>
+    <div class="my-12 flex flex-col gap-8 items-center">
+      <form
+        action="/short-url"
+        method="post"
+        class="flex w-full gap-4 flex-row"
+      >
+        <div class="relative w-full h-10">
+          <input
+            placeholder=""
+            type="url"
+            name="url"
+            autocomplete="off"
+            required
+            class="peer w-full h-full bg-transparent font-normal outline outline-0 focus:outline-0 transition-all placeholder-shown:border border focus:border-2 focus:border-t-transparent text-sm px-3 py-2.5 rounded-md focus:border-gray-900"
+          />
+          <label
+            for="url"
+            class="flex w-full h-full select-none pointer-events-none absolute left-0 font-normal !overflow-visible truncate leading-tight peer-focus:leading-tight peer-disabled:text-transparent transition-all -top-1.5 peer-placeholder-shown:text-sm text-xs peer-focus:text-xs before:block before:box-border before:w-2.5 before:h-1.5 before:mt-[6.5px] before:mr-1 peer-placeholder-shown:before:border-transparent before:rounded-tl-md before:border-t peer-focus:before:border-t-2 before:border-l peer-focus:before:border-l-2 before:pointer-events-none before:transition-all peer-disabled:before:border-transparent after:block after:flex-grow after:box-border after:w-2.5 after:h-1.5 after:mt-[6.5px] after:ml-1 peer-placeholder-shown:after:border-transparent after:rounded-tr-md after:border-t peer-focus:after:border-t-2 after:border-r peer-focus:after:border-r-2 after:pointer-events-none after:transition-all peer-disabled:after:border-transparent peer-placeholder-shown:leading-[3.75] text-gray-500 peer-focus:text-gray-900 peer-focus:before:!border-gray-900 peer-focus:after:!border-gray-900"
+          >
+            Enter URL
+          </label>
+        </div>
+        <button
+          type="submit"
+          class="align-middle select-none font-semibold text-center tracking-wider uppercase transition-all disabled:opacity-50 disabled:pointer-events-none text-xs py-3 px-6 rounded-lg hover:bg-gray-900/90 bg-gray-900 text-white"
+        >
+          Generate
+        </button>
+      </form>
+
+      <% if (locals.error) { %>
+      <p class="text-red-500 font-semibold"><%= error %></p>
+      <% } %>
+
+      <% if (locals.shortUrl) { %>
+      <div class="flex items-center gap-x-4">
+        <p
+          id="copy-text"
+          class="block text-xl antialiased font-normal leading-relaxed text-inherit"
+        >
+          <%= shortUrl %>
+        </p>
+        <button
+          id="copy-btn"
+          onclick="copyText()"
+          class="relative h-10 max-h-[40px] w-10 max-w-[40px] select-none rounded-lg hover:bg-gray-900/90 bg-gray-900 text-center align-middle text-xs font-medium uppercase text-white transition-all disabled:pointer-events-none disabled:opacity-80"
+          type="button"
+        >
+          <span
+            id="copy"
+            class="absolute transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1.5"
+              stroke="currentColor"
+              aria-hidden="true"
+              class="w-5 h-5 text-white"
+            >
+              <path
+                stroke-linecap="round"
+                stroke-linejoin="round"
+                d="M15.75 17.25v3.375c0 .621-.504 1.125-1.125 1.125h-9.75a1.125 1.125 0 01-1.125-1.125V7.875c0-.621.504-1.125 1.125-1.125H6.75a9.06 9.06 0 011.5.124m7.5 10.376h3.375c.621 0 1.125-.504 1.125-1.125V11.25c0-4.46-3.243-8.161-7.5-8.876a9.06 9.06 0 00-1.5-.124H9.375c-.621 0-1.125.504-1.125 1.125v3.5m7.5 10.375H9.375a1.125 1.125 0 01-1.125-1.125v-9.25m12 6.625v-1.875a3.375 3.375 0 00-3.375-3.375h-1.5a1.125 1.125 0 01-1.125-1.125v-1.5a3.375 3.375 0 00-3.375-3.375H9.75"
+              ></path>
+            </svg>
+          </span>
+          <span
+            id="tick"
+            class="absolute hidden transform -translate-x-1/2 -translate-y-1/2 top-1/2 left-1/2"
+          >
+            <svg
+              xmlns="http://www.w3.org/2000/svg"
+              fill="none"
+              viewBox="0 0 24 24"
+              stroke-width="1"
+              stroke="currentColor"
+              aria-hidden="true"
+              class="size-6 text-white"
+            >
+              <path
+                fill-rule="evenodd"
+                clip-rule="evenodd"
+                d="M17.4995 7.44055C17.8085 7.71643 17.8353 8.19054 17.5595 8.49952L10.4166 16.4995C10.2743 16.6589 10.0708 16.75 9.85715 16.75C9.6435 16.75 9.43999 16.6589 9.2977 16.4995L6.44055 13.2995C6.16468 12.9905 6.19152 12.5164 6.5005 12.2406C6.80947 11.9647 7.28359 11.9915 7.55946 12.3005L9.85715 14.8739L16.4406 7.5005C16.7164 7.19152 17.1905 7.16468 17.4995 7.44055Z"
+                fill="#ffffff"
+              ></path>
+            </svg>
+          </span>
+        </button>
+      </div>
+      <% } %>
+    </div>
+
+    <script>
+      const copyIcon = document.getElementById('copy');
+      const tickIcon = document.getElementById('tick');
+      let isCopied = false;
+
+      async function copyText() {
+        let text = document.getElementById('copy-text');
+        let copyBtn = document.getElementById('copy-btn');
+
+        try {
+          await navigator.clipboard.writeText(text.innerText);
+          console.log('Text copied to clipboard!');
+          isCopied = true;
+        } catch (err) {
+          console.error('Failed to copy text:', err);
+        } finally {
+          tickIcon.classList.toggle('hidden');
+          copyIcon.classList.toggle('hidden');
+          copyBtn.disabled = true;
+
+          setTimeout(() => {
+            tickIcon.classList.toggle('hidden');
+            copyIcon.classList.toggle('hidden');
+            isCopied = false;
+            copyBtn.disabled = false;
+          }, 2000);
+        }
+      }
+    </script>
   </body>
 </html>

@@ -2,17 +2,27 @@ import { Request, Response } from 'express';
 import { nanoid } from 'nanoid';
 import { URI } from '../model/url.js';
 import { PORT } from '../constant.js';
+import whatwg from 'whatwg-url';
 
 const generateShortUrl = async (req: Request, res: Response) => {
   const { url } = req.body;
 
   if (!url) return res.status(400).json({ error: 'URL is required' });
 
-  const existingUrl = await URI.findOne({ redirectUrl: url });
+  const parsedUrl = whatwg.parseURL(url);
+
+  if (parsedUrl?.host == req.hostname) {
+    return res.render('index', {
+      error: 'Invalid URL',
+    });
+  }
+
   const baseUrl = `${req.protocol}://${req.hostname}:${PORT}`;
 
+  const existingUrl = await URI.findOne({ redirectUrl: url });
+
   if (existingUrl) {
-    return res.json({
+    return res.render('index', {
       message: 'URL already shortened!',
       shortUrl: `${baseUrl}/${existingUrl.shortId}`,
     });
@@ -26,7 +36,7 @@ const generateShortUrl = async (req: Request, res: Response) => {
       visitHistory: [],
     });
 
-    return res.json({
+    return res.render('index', {
       shortUrl: `${baseUrl}/${shortId}`,
     });
   } catch (error) {
