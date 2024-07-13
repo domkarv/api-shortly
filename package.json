@@ -10,7 +10,8 @@
     "dev": "pnpm run \"/dev:/\"",
     "build": "tsc -b",
     "prestart": "pnpm build",
-    "start": "pnpm build && node --env-file=.env dist/index.js"
+    "start": "node --env-file=.env dist/index.js",
+    "format": "prettier --write \"**/*.{ts,json,ejs}\""
   },
   "keywords": [],
   "author": "Omkar Date",
@@ -27,6 +28,7 @@
     "@types/express": "^4.17.21",
     "@types/node": "^20.14.10",
     "@types/whatwg-url": "^11.0.5",
+    "prettier": "^3.3.2",
     "typescript": "^5.5.3"
   }
 }

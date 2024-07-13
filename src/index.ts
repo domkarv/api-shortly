@@ -1,6 +1,6 @@
-import app from "./app.js";
-import { PORT } from "./constant.js";
-import connectDB from "./db.js";
+import app from './app.js';
+import { PORT } from './constant.js';
+import connectDB from './db.js';
 
 connectDB()
   .then(() => {
@@ -9,5 +9,5 @@ connectDB()
     });
   })
   .catch((err) => {
-    console.log("MONGO db connection failed !!! ", err);
+    console.log('MONGO db connection failed !!! ', err);
   });

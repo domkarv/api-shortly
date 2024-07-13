@@ -1,10 +1,10 @@
-import { NextFunction, Request, Response } from "express";
-import whatwg from "whatwg-url";
+import { NextFunction, Request, Response } from 'express';
+import whatwg from 'whatwg-url';
 
 export const parseUrlMiddleware = (
   req: Request,
   res: Response,
-  next: NextFunction
+  next: NextFunction,
 ) => {
   const originalUrl = req.body.url as string;
 

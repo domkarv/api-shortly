@@ -1,4 +1,4 @@
-import mongoose from "mongoose";
+import mongoose from 'mongoose';
 
 const URISchema = new mongoose.Schema(
   {
@@ -13,7 +13,7 @@ const URISchema = new mongoose.Schema(
     },
     visitHistory: [{ timestamp: { type: Number } }],
   },
-  { timestamps: true }
+  { timestamps: true },
 );
 
-export const URI = mongoose.model("url", URISchema);
+export const URI = mongoose.model('url', URISchema);
