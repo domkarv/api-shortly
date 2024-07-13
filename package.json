@@ -8,7 +8,7 @@
     "dev:tsc": "tsc -b --watch --preserveWatchOutput",
     "dev:tailwind": "tailwindcss -i public/css/input.css -o public/css/output.css --minify --watch",
     "dev:node": "node --env-file=.env --enable-source-maps --watch dist/src/index.js",
-    "dev": "pnpm run \"/dev:/\"",
+    "dev": "pnpm build && pnpm run \"/dev:/\"",
     "tailwind": "tailwindcss -i public/css/input.css -o public/css/output.css --minify",
     "build": "tsc -b",
     "prestart": "pnpm build && pnpm tailwind",
