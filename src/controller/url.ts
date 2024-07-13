@@ -12,7 +12,7 @@ const generateShortUrl = async (req: Request, res: Response) => {
   const parsedUrl = whatwg.parseURL(url);
 
   if (parsedUrl?.host == req.hostname) {
-    return res.render('index', {
+    return res.json({
       error: 'Invalid URL',
     });
   }
@@ -22,7 +22,7 @@ const generateShortUrl = async (req: Request, res: Response) => {
   const existingUrl = await URI.findOne({ redirectUrl: url });
 
   if (existingUrl) {
-    return res.render('index', {
+    return res.json({
       message: 'URL already shortened!',
       shortUrl: `${baseUrl}/${existingUrl.shortId}`,
     });
@@ -36,7 +36,7 @@ const generateShortUrl = async (req: Request, res: Response) => {
       visitHistory: [],
     });
 
-    return res.render('index', {
+    return res.json({
       shortUrl: `${baseUrl}/${shortId}`,
     });
   } catch (error) {

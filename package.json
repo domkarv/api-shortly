@@ -6,21 +6,18 @@
   "description": "",
   "scripts": {
     "dev:tsc": "tsc -b --watch --preserveWatchOutput",
-    "dev:tailwind": "tailwindcss -i public/css/input.css -o public/css/output.css --minify --watch",
     "dev:node": "node --env-file=.env --enable-source-maps --watch dist/src/index.js",
     "dev": "pnpm build && pnpm run \"/dev:/\"",
-    "tailwind": "tailwindcss -i public/css/input.css -o public/css/output.css --minify",
     "build": "tsc -b",
-    "prestart": "pnpm build && pnpm tailwind",
+    "prestart": "pnpm build",
     "start": "node --env-file=.env dist/src/index.js",
-    "format": "prettier --write \"**/*.{ts,js,json,ejs}\""
+    "format": "prettier --write \"**/*.{ts,js,json}\""
   },
   "keywords": [],
   "author": "Omkar Date",
   "license": "ISC",
   "dependencies": {
     "cors": "^2.8.5",
-    "ejs": "^3.1.10",
     "express": "^4.19.2",
     "mongoose": "^8.5.0",
     "nanoid": "^5.0.7",
@@ -32,9 +29,6 @@
     "@types/node": "^20.14.10",
     "@types/whatwg-url": "^11.0.5",
     "prettier": "^3.3.2",
-    "prettier-plugin-ejs": "^1.0.3",
-    "prettier-plugin-tailwindcss": "^0.6.5",
-    "tailwindcss": "^3.4.4",
     "typescript": "^5.5.3"
   }
 }

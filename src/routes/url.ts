@@ -8,7 +8,7 @@ import { parseUrlMiddleware } from '../middleware/parse-url.js';
 
 const urlRouter = Router();
 
-urlRouter.post('/short-url', parseUrlMiddleware, generateShortUrl);
+urlRouter.post('/url', parseUrlMiddleware, generateShortUrl);
 
 urlRouter.get('/analytics/:shortId', handleAnalytics);
 
