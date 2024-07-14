@@ -4,11 +4,10 @@ import {
   handleAnalytics,
   redirectToMainUrl,
 } from '../controller/url.js';
-import { parseUrlMiddleware } from '../middleware/parse-url.js';
 
 const urlRouter = Router();
 
-urlRouter.post('/url', parseUrlMiddleware, generateShortUrl);
+urlRouter.post('/url', generateShortUrl);
 
 urlRouter.get('/analytics/:shortId', handleAnalytics);
 

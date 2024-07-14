@@ -7,6 +7,7 @@ README.md
 /.pnp
 .pnp.js
 .yarn/install-state.gz
+/migrations
 
 # testing
 /coverage

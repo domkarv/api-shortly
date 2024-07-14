@@ -1,44 +1,42 @@
 import { Request, Response } from 'express';
 import { nanoid } from 'nanoid';
-import { URI } from '../model/url.js';
-import { PORT } from '../constant.js';
 import whatwg from 'whatwg-url';
+import { db } from '../db/index.js';
+import { analytics, uri } from '../db/schema.js';
 
 const generateShortUrl = async (req: Request, res: Response) => {
   const { url } = req.body;
 
-  if (!url) return res.status(400).json({ error: 'URL is required' });
-
   const parsedUrl = whatwg.parseURL(url);
 
-  if (parsedUrl?.host == req.hostname) {
-    return res.json({
-      error: 'Invalid URL',
-    });
+  if (!parsedUrl) return res.status(400).json({ error: 'Invalid URL' });
+
+  const newUrl = whatwg.serializeURL(parsedUrl, true);
+
+  if (parsedUrl.host == req.hostname) {
+    return res.status(400).json({ error: 'Invalid URL' });
   }
 
-  const baseUrl = `${req.protocol}://${req.hostname}:${PORT}`;
+  const existingUri = await db.query.uri.findFirst({
+    where: (uri, { eq }) => eq(uri.mainUrl, newUrl),
+  });
 
-  const existingUrl = await URI.findOne({ redirectUrl: url });
-
-  if (existingUrl) {
+  if (existingUri) {
     return res.json({
       message: 'URL already shortened!',
-      shortUrl: `${baseUrl}/${existingUrl.shortId}`,
+      shortUrlId: existingUri.shortUrlId,
     });
   }
 
   try {
-    const shortId = nanoid(8);
-    await URI.create({
-      shortId,
-      redirectUrl: url,
-      visitHistory: [],
+    const shortUrlId = nanoid(8);
+
+    await db.insert(uri).values({
+      shortUrlId: shortUrlId,
+      mainUrl: newUrl,
     });
 
-    return res.json({
-      shortUrl: `${baseUrl}/${shortId}`,
-    });
+    return res.json({ shortUrlId });
   } catch (error) {
     if (error instanceof Error) console.error(error.message);
     else console.error(error);
@@ -50,23 +48,20 @@ const generateShortUrl = async (req: Request, res: Response) => {
 const redirectToMainUrl = async (req: Request, res: Response) => {
   const shortId = req.params.shortId;
 
-  if (!shortId) return res.status(400).json({ error: 'Invallid URL' });
+  if (!shortId) return res.status(400).json({ error: 'Invalid URL' });
 
   try {
-    const urlData = await URI.findOneAndUpdate(
-      { shortId },
-      {
-        $push: {
-          visitHistory: {
-            timestamp: Date.now(),
-          },
-        },
-      },
-    );
+    const existingUri = await db.query.uri.findFirst({
+      where: (uri, { eq }) => eq(uri.shortUrlId, shortId),
+    });
 
-    if (!urlData) return res.status(404).json({ error: 'Invallid URL' });
+    if (!existingUri) return res.status(404).json({ error: 'Invalid URL' });
 
-    res.redirect(urlData.redirectUrl);
+    await db.insert(analytics).values({
+      uriId: existingUri.shortUrlId,
+    });
+
+    return res.redirect(existingUri.mainUrl);
   } catch (error) {
     if (error instanceof Error) console.error(error.message);
     else console.error(error);
@@ -78,13 +73,18 @@ const redirectToMainUrl = async (req: Request, res: Response) => {
 const handleAnalytics = async (req: Request, res: Response) => {
   const shortId = req.params.shortId;
 
-  const urlData = await URI.findOne({ shortId });
+  if (!shortId) return res.status(400).json({ error: 'Plz provide shortId' });
+
+  const urlData = await db.query.uri.findFirst({
+    where: (uri, { eq }) => eq(uri.shortUrlId, shortId),
+    with: { analytics: true },
+  });
 
   if (!urlData) return res.status(404).json({ error: 'Invalid URL' });
 
   return res.json({
-    visitCount: urlData.visitHistory.length,
-    visitAnalytics: urlData.visitHistory,
+    visitCount: urlData.analytics.length,
+    visitAnalytics: urlData.analytics,
   });
 };
 
