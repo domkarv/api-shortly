@@ -88,4 +88,13 @@ const handleAnalytics = async (req: Request, res: Response) => {
   });
 };
 
-export { generateShortUrl, redirectToMainUrl, handleAnalytics };
+const getAllURLs = async (req: Request, res: Response) => {
+  const urlsData = await db.query.uri.findMany({});
+
+  if (!urlsData)
+    return res.status(500).json({ error: 'Internal Server Error' });
+
+  return res.json({ urls: urlsData });
+};
+
+export { generateShortUrl, redirectToMainUrl, handleAnalytics, getAllURLs };
